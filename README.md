@@ -1,37 +1,32 @@
-Function Visualizer
+<h1>Function Visualizer</h1>
 
-Aplikasi web untuk mem-plot fungsi matematika secara interaktif. Kamu bisa menambah banyak fungsi, memilih warna, mengatur range sumbu, memakai preset, dan mengganti tema gelap/terang.
+<p>
+Aplikasi web untuk mem-plot fungsi matematika secara interaktif. 
+Mendukung banyak fungsi, pilihan warna, preset, dan tema gelap/terang.
+</p>
 
-✨ Fitur
+<h2>✨ Fitur</h2>
+<ul>
+  <li>Plot beberapa fungsi sekaligus</li>
+  <li>Preset fungsi dasar, trigonometri, eksponensial</li>
+  <li>Smooth curve, grid, dan axis label</li>
+  <li>Tema light/dark</li>
+  <li>Real-time plotting</li>
+</ul>
 
-Plot beberapa fungsi sekaligus
+<h2>📘 Fungsi Matematika yang Didukung</h2>
+<ul>
+  <li><strong>Operator dasar:</strong> +, -, *, /, ^</li>
+  <li><strong>Trigonometri:</strong> sin(x), cos(x), tan(x), asin, acos, atan</li>
+  <li><strong>Logaritma:</strong> log(x), log10(x), log2(x)</li>
+  <li><strong>Eksponensial:</strong> exp(x), 2^x, e^x</li>
+  <li><strong>Fungsi umum:</strong> sqrt(x), abs(x), floor(x), ceil(x)</li>
+  <li><strong>Konstanta:</strong> pi, e</li>
+</ul>
 
-Preset fungsi dasar, trigonometri, eksponensial
-
-Smooth curve, grid, axis label
-
-Tema light/dark
-
-Real-time plotting
-
-📘 Fungsi Matematika yang Didukung
-
-Operator dasar: +, -, *, /, ^
-
-Trigonometri: sin(x), cos(x), tan(x), asin, acos, atan
-
-Logaritma: log(x), log10(x), log2(x)
-
-Eksponensial: exp(x), 2^x, e^x
-
-Fungsi umum: sqrt(x), abs(x), floor(x), ceil(x)
-
-Konstanta: pi, e
-
-▶️ Cara Pakai
-
-Download/clone repo
-
-Buka index.html
-
-Masukkan fungsi lalu klik Plot
+<h2>▶️ Cara Pakai</h2>
+<ol>
+  <li>Download atau clone repo</li>
+  <li>Buka <code>index.html</code> di browser</li>
+  <li>Masukkan fungsi lalu klik <i>Plot</i></li>
+</ol>
