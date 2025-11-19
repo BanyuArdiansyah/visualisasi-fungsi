@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+</head>
+<body>
+    <div class="grain"></div>
+    
+    <div class="help-modal" id="helpModal">
+        <div class="help-content">
+            <button class="close-btn" id="closeHelp">×</button>
+            <h2>Function Syntax</h2>
+            <div class="help-grid">
+                <div class="help-item">
+                    <div class="help-category">Basic Operations</div>
+                    <div class="help-examples">+, -, *, /, ^</div>
+                </div>
+                <div class="help-item">
+                    <div class="help-category">Trigonometric</div>
+                    <div class="help-examples">sin(x), cos(x), tan(x)</div>
+                </div>
+                <div class="help-item">
+                    <div class="help-category">Logarithmic</div>
+                    <div class="help-examples">log(x), log2(x), log10(x)</div>
+                </div>
+                <div class="help-item">
+                    <div class="help-category">Exponential</div>
+                    <div class="help-examples">exp(x), 2^x, e^x</div>
+                </div>
+                <div class="help-item">
+                    <div class="help-category">Other Functions</div>
+                    <div class="help-examples">sqrt(x), abs(x), floor(x), ceil(x)</div>
+                </div>
+                <div class="help-item">
+                    <div class="help-category">Constants</div>
+                    <div class="help-examples">pi, e</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand">Function Visualizer</div>
+        <div class="nav-actions">
+            <button class="icon-btn" id="helpBtn" title="Help">?</button>
+            <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="layout">
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">ƒ</span>
+                        <h3>Functions</h3>
+                    </div>
+                    <div id="functionsList" class="functions-container"></div>
+                    <button class="btn-add" id="addFunction">
+                        <span class="btn-icon">+</span>
+                        Add Function
+                    </button>
+                </div>
+
+                <div class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">⊞</span>
+                        <h3>Axis Range</h3>
+                    </div>
+                    <div class="range-grid">
+                        <div class="input-wrapper">
+                            <label>X Min</label>
+                            <input type="number" id="xMin" value="-10" step="0.1">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>X Max</label>
+                            <input type="number" id="xMax" value="10" step="0.1">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Y Min</label>
+                            <input type="number" id="yMin" value="-10" step="0.1">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Y Max</label>
+                            <input type="number" id="yMax" value="10" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">⚙</span>
+                        <h3>Display</h3>
+                    </div>
+                    <div class="toggles">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="gridLines" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Grid Lines</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="axisLines" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Axis Labels</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="smoothLine" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Smooth Curves</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="panel-section presets-section">
+                    <div class="section-header">
+                        <span class="section-icon">★</span>
+                        <h3>Presets</h3>
+                    </div>
+                    
+                    <div class="preset-category">
+                        <div class="preset-title">Basic</div>
+                        <div class="preset-buttons">
+                            <button class="preset-pill" data-function="x">x</button>
+                            <button class="preset-pill" data-function="x^2">x²</button>
+                            <button class="preset-pill" data-function="x^3">x³</button>
+                            <button class="preset-pill" data-function="1/x">1/x</button>
+                            <button class="preset-pill" data-function="sqrt(x)">√x</button>
+                            <button class="preset-pill" data-function="abs(x)">|x|</button>
+                        </div>
+                    </div>
+
+                    <div class="preset-category">
+                        <div class="preset-title">Trigonometric</div>
+                        <div class="preset-buttons">
+                            <button class="preset-pill" data-function="sin(x)">sin(x)</button>
+                            <button class="preset-pill" data-function="cos(x)">cos(x)</button>
+                            <button class="preset-pill" data-function="tan(x)">tan(x)</button>
+                            <button class="preset-pill" data-function="sin(2*x)">sin(2x)</button>
+                        </div>
+                    </div>
+
+                    <div class="preset-category">
+                        <div class="preset-title">Exponential</div>
+                        <div class="preset-buttons">
+                            <button class="preset-pill" data-function="exp(x)">eˣ</button>
+                            <button class="preset-pill" data-function="2^x">2ˣ</button>
+                            <button class="preset-pill" data-function="log(x)">ln(x)</button>
+                            <button class="preset-pill" data-function="log10(x)">log(x)</button>
+                        </div>
+                    </div>
+
+                    <div class="preset-category">
+                        <div class="preset-title">Advanced</div>
+                        <div class="preset-buttons">
+                            <button class="preset-pill" data-function="sin(x)/x">sinc(x)</button>
+                            <button class="preset-pill" data-function="x^2*sin(x)">x²sin(x)</button>
+                            <button class="preset-pill" data-function="exp(-x^2)">e^(-x²)</button>
+                            <button class="preset-pill" data-function="sin(1/x)">sin(1/x)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-plot" id="plotButton">
+                    <span class="plot-icon">▶</span>
+                    Plot Functions
+                </button>
+            </aside>
+
+            <main class="graph-area">
+                <div class="graph-card">
+                    <div class="graph-wrapper">
+                        <canvas id="functionGraph"></canvas>
+                    </div>
+                    <div class="graph-footer">
+                        <div class="graph-info" id="functionInfo">f(x) = x²</div>
+                        <div class="graph-coords" id="coordinates">(0, 0)</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="toast" id="errorToast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

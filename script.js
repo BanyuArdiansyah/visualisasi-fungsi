@@ -1,0 +1,332 @@
+let chart = null;
+let functionCount = 0;
+
+// Color palette
+const colors = [
+    '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981',
+    '#06b6d4', '#ef4444', '#84cc16', '#f97316', '#a855f7'
+];
+
+// DOM Elements
+const functionsList = document.getElementById('functionsList');
+const addFunctionBtn = document.getElementById('addFunction');
+const plotButton = document.getElementById('plotButton');
+const xMinInput = document.getElementById('xMin');
+const xMaxInput = document.getElementById('xMax');
+const yMinInput = document.getElementById('yMin');
+const yMaxInput = document.getElementById('yMax');
+const gridLinesCheckbox = document.getElementById('gridLines');
+const axisLinesCheckbox = document.getElementById('axisLines');
+const smoothLineCheckbox = document.getElementById('smoothLine');
+const functionInfo = document.getElementById('functionInfo');
+const coordinates = document.getElementById('coordinates');
+const errorToast = document.getElementById('errorToast');
+const themeBtn = document.getElementById('themeBtn');
+const helpBtn = document.getElementById('helpBtn');
+const helpModal = document.getElementById('helpModal');
+const closeHelp = document.getElementById('closeHelp');
+const presetButtons = document.querySelectorAll('.preset-pill');
+
+// Initialize theme
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+}
+
+// Toggle theme
+themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    if (chart) plotFunction();
+});
+
+// Help modal
+helpBtn.addEventListener('click', () => {
+    helpModal.classList.add('active');
+});
+
+closeHelp.addEventListener('click', () => {
+    helpModal.classList.remove('active');
+});
+
+helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) {
+        helpModal.classList.remove('active');
+    }
+});
+
+// Show error toast
+function showError(message) {
+    errorToast.textContent = message;
+    errorToast.classList.add('show');
+    setTimeout(() => {
+        errorToast.classList.remove('show');
+    }, 3000);
+}
+
+// Generate points for function
+function generatePoints(func, xMin, xMax) {
+    const points = [];
+    const steps = 1000;
+    const stepSize = (xMax - xMin) / steps;
+
+    for (let i = 0; i <= steps; i++) {
+        const x = xMin + (i * stepSize);
+        try {
+            const scope = { x: x, pi: Math.PI, e: Math.E };
+            const y = math.evaluate(func, scope);
+            if (!isNaN(y) && isFinite(y)) {
+                points.push({ x: x, y: y });
+            }
+        } catch (error) {
+            return [];
+        }
+    }
+
+    return points;
+}
+
+// Create function card
+function createFunctionCard(func = '') {
+    functionCount++;
+    const id = functionCount;
+
+    const card = document.createElement('div');
+    card.className = 'function-card';
+    card.dataset.id = id;
+
+    card.innerHTML = `
+        <div class="function-card-header">
+            <span class="function-label">f${id}(x) =</span>
+            <button class="remove-btn" title="Remove">×</button>
+        </div>
+        <div class="function-input-row">
+            <input type="text" class="function-input" id="function-${id}" 
+                   value="${func}" placeholder="e.g., x^2, sin(x)">
+            <input type="color" class="color-picker" id="color-${id}" 
+                   value="${colors[(id - 1) % colors.length]}">
+        </div>
+    `;
+
+    const removeBtn = card.querySelector('.remove-btn');
+    removeBtn.addEventListener('click', () => {
+        if (document.querySelectorAll('.function-card').length > 1) {
+            card.remove();
+            plotFunction();
+        } else {
+            showError('At least one function is required');
+        }
+    });
+
+    const input = card.querySelector('.function-input');
+    input.addEventListener('input', debounce(plotFunction, 500));
+
+    const colorPicker = card.querySelector('.color-picker');
+    colorPicker.addEventListener('change', plotFunction);
+
+    return card;
+}
+
+// Add function
+addFunctionBtn.addEventListener('click', () => {
+    const card = createFunctionCard();
+    functionsList.appendChild(card);
+});
+
+// Get all functions
+function getAllFunctions() {
+    const functions = [];
+    document.querySelectorAll('.function-card').forEach(card => {
+        const id = card.dataset.id;
+        const input = document.getElementById(`function-${id}`);
+        const color = document.getElementById(`color-${id}`);
+        const func = input.value.trim();
+        if (func) {
+            functions.push({ func, color: color.value, id });
+        }
+    });
+    return functions;
+}
+
+// Debounce
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// Plot function
+function plotFunction() {
+    const xMin = parseFloat(xMinInput.value);
+    const xMax = parseFloat(xMaxInput.value);
+    const yMin = parseFloat(yMinInput.value);
+    const yMax = parseFloat(yMaxInput.value);
+
+    if (xMin >= xMax) {
+        showError('X Min must be less than X Max');
+        return;
+    }
+
+    if (yMin >= yMax) {
+        showError('Y Min must be less than Y Max');
+        return;
+    }
+
+    const functions = getAllFunctions();
+    if (functions.length === 0) {
+        showError('Please enter at least one function');
+        return;
+    }
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    const datasets = [];
+    let hasError = false;
+
+    functions.forEach(({ func, color }) => {
+        const points = generatePoints(func, xMin, xMax);
+        if (points.length === 0) {
+            hasError = true;
+            showError(`Error in function: ${func}`);
+            return;
+        }
+        datasets.push({
+            label: `f(x) = ${func}`,
+            data: points,
+            borderColor: color,
+            backgroundColor: color + '30',
+            borderWidth: 3,
+            fill: false,
+            pointRadius: 0,
+            tension: smoothLineCheckbox.checked ? 0.4 : 0
+        });
+    });
+
+    if (hasError) return;
+
+    const isLight = document.body.classList.contains('light-mode');
+    const gridColor = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(139, 147, 184, 0.1)';
+    const textColor = isLight ? '#475569' : '#8b93b8';
+
+    const ctx = document.getElementById('functionGraph').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'center',
+                    min: xMin,
+                    max: xMax,
+                    grid: {
+                        display: gridLinesCheckbox.checked,
+                        color: gridColor,
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        display: axisLinesCheckbox.checked,
+                        color: textColor,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    position: 'center',
+                    min: yMin,
+                    max: yMax,
+                    grid: {
+                        display: gridLinesCheckbox.checked,
+                        color: gridColor,
+                        lineWidth: 1
+                    },
+                    ticks: {
+                        display: axisLinesCheckbox.checked,
+                        color: textColor,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            size: 13,
+                            family: "'Courier New', monospace"
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'line'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 36, 66, 0.95)',
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: gridColor,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}`;
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+
+    const functionsList = functions.map(f => f.func).join(', ');
+    functionInfo.textContent = `Functions: ${functionsList}`;
+}
+
+// Preset buttons
+presetButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const func = btn.dataset.function;
+        const card = createFunctionCard(func);
+        functionsList.appendChild(card);
+        plotFunction();
+    });
+});
+
+// Plot button
+plotButton.addEventListener('click', plotFunction);
+
+// Settings change handlers
+gridLinesCheckbox.addEventListener('change', plotFunction);
+axisLinesCheckbox.addEventListener('change', plotFunction);
+smoothLineCheckbox.addEventListener('change', plotFunction);
+
+// Range inputs
+[xMinInput, xMaxInput, yMinInput, yMaxInput].forEach(input => {
+    input.addEventListener('change', plotFunction);
+});
+
+// Initialize
+initTheme();
+const initialCard = createFunctionCard('x^2');
+functionsList.appendChild(initialCard);
+plotFunction();
