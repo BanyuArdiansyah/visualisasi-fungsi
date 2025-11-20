@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Function Visualizer</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -49,12 +49,15 @@
         <div class="nav-actions">
             <button class="icon-btn" id="helpBtn" title="Help">?</button>
             <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
+            <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" title="Menu">☰</button>
         </div>
     </nav>
 
     <div class="container">
         <div class="layout">
-            <aside class="control-panel">
+            <aside class="control-panel" id="controlPanel">
+                <button class="panel-close-btn" id="panelCloseBtn">×</button>
+                
                 <div class="panel-section">
                     <div class="section-header">
                         <span class="section-icon">ƒ</span>
@@ -173,6 +176,16 @@
 
             <main class="graph-area">
                 <div class="graph-card">
+                    <div class="graph-header">
+                        <button class="download-btn" id="downloadBtn" title="Download Graph">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
                     <div class="graph-wrapper">
                         <canvas id="functionGraph"></canvas>
                     </div>
