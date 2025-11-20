@@ -26,6 +26,52 @@ const helpBtn = document.getElementById('helpBtn');
 const helpModal = document.getElementById('helpModal');
 const closeHelp = document.getElementById('closeHelp');
 const presetButtons = document.querySelectorAll('.preset-pill');
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const controlPanel = document.getElementById('controlPanel');
+const panelCloseBtn = document.getElementById('panelCloseBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+// Download graph as image
+downloadBtn.addEventListener('click', () => {
+    if (!chart) {
+        showError('Please plot a function first');
+        return;
+    }
+    
+    const canvas = document.getElementById('functionGraph');
+    const url = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = 'function-graph.png';
+    link.href = url;
+    link.click();
+});
+
+// Mobile menu toggle
+mobileMenuBtn.addEventListener('click', () => {
+    controlPanel.classList.add('mobile-active');
+});
+
+panelCloseBtn.addEventListener('click', () => {
+    controlPanel.classList.remove('mobile-active');
+});
+
+// Close mobile panel when clicking outside on mobile
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+        if (controlPanel.classList.contains('mobile-active') && 
+            !controlPanel.contains(e.target) && 
+            !mobileMenuBtn.contains(e.target)) {
+            controlPanel.classList.remove('mobile-active');
+        }
+    }
+});
+
+// Close mobile panel after plotting
+function closeMobilePanelIfNeeded() {
+    if (window.innerWidth <= 768 && controlPanel.classList.contains('mobile-active')) {
+        controlPanel.classList.remove('mobile-active');
+    }
+}
 
 // Initialize theme
 function initTheme() {
@@ -215,6 +261,11 @@ function plotFunction() {
     const gridColor = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(139, 147, 184, 0.1)';
     const textColor = isLight ? '#475569' : '#8b93b8';
 
+    // Responsive font sizes
+    const isMobile = window.innerWidth <= 768;
+    const fontSize = isMobile ? 10 : 12;
+    const legendFontSize = isMobile ? 11 : 13;
+
     const ctx = document.getElementById('functionGraph').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
@@ -237,7 +288,7 @@ function plotFunction() {
                         display: axisLinesCheckbox.checked,
                         color: textColor,
                         font: {
-                            size: 12
+                            size: fontSize
                         }
                     }
                 },
@@ -255,7 +306,7 @@ function plotFunction() {
                         display: axisLinesCheckbox.checked,
                         color: textColor,
                         font: {
-                            size: 12
+                            size: fontSize
                         }
                     }
                 }
@@ -266,12 +317,13 @@ function plotFunction() {
                     labels: {
                         color: textColor,
                         font: {
-                            size: 13,
+                            size: legendFontSize,
                             family: "'Courier New', monospace"
                         },
-                        padding: 15,
+                        padding: isMobile ? 10 : 15,
                         usePointStyle: true,
-                        pointStyle: 'line'
+                        pointStyle: 'line',
+                        boxWidth: isMobile ? 20 : 30
                     }
                 },
                 tooltip: {
@@ -282,8 +334,14 @@ function plotFunction() {
                     bodyColor: textColor,
                     borderColor: gridColor,
                     borderWidth: 1,
-                    padding: 12,
+                    padding: isMobile ? 8 : 12,
                     displayColors: true,
+                    titleFont: {
+                        size: fontSize
+                    },
+                    bodyFont: {
+                        size: fontSize
+                    },
                     callbacks: {
                         label: function(context) {
                             return `${context.dataset.label}: ${context.parsed.y.toFixed(4)}`;
@@ -300,6 +358,8 @@ function plotFunction() {
 
     const functionsList = functions.map(f => f.func).join(', ');
     functionInfo.textContent = `Functions: ${functionsList}`;
+    
+    closeMobilePanelIfNeeded();
 }
 
 // Preset buttons
@@ -323,6 +383,17 @@ smoothLineCheckbox.addEventListener('change', plotFunction);
 // Range inputs
 [xMinInput, xMaxInput, yMinInput, yMaxInput].forEach(input => {
     input.addEventListener('change', plotFunction);
+});
+
+// Handle window resize to update chart
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        if (chart) {
+            plotFunction();
+        }
+    }, 250);
 });
 
 // Initialize
