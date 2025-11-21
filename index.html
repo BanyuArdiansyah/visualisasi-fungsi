@@ -1,209 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
     <title>Function Visualizer</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="grain"></div>
-    
+
     <div class="help-modal" id="helpModal">
-        <div class="help-content">
-            <button class="close-btn" id="closeHelp">×</button>
-            <h2>Function Syntax</h2>
-            <div class="help-grid">
-                <div class="help-item">
-                    <div class="help-category">Basic Operations</div>
-                    <div class="help-examples">+, -, *, /, ^</div>
-                </div>
-                <div class="help-item">
-                    <div class="help-category">Trigonometric</div>
-                    <div class="help-examples">sin(x), cos(x), tan(x)</div>
-                </div>
-                <div class="help-item">
-                    <div class="help-category">Logarithmic</div>
-                    <div class="help-examples">log(x), log2(x), log10(x)</div>
-                </div>
-                <div class="help-item">
-                    <div class="help-category">Exponential</div>
-                    <div class="help-examples">exp(x), 2^x, e^x</div>
-                </div>
-                <div class="help-item">
-                    <div class="help-category">Other Functions</div>
-                    <div class="help-examples">sqrt(x), abs(x), floor(x), ceil(x)</div>
-                </div>
-                <div class="help-item">
-                    <div class="help-category">Constants</div>
-                    <div class="help-examples">pi, e</div>
-                </div>
-            </div>
+      <div class="help-content">
+        <button class="close-btn" id="closeHelp">×</button>
+        <h2>Function Syntax</h2>
+        <div class="help-grid">
+          <div class="help-item">
+            <div class="help-category">Basic Operations</div>
+            <div class="help-examples">+, -, *, /, ^</div>
+          </div>
+          <div class="help-item">
+            <div class="help-category">Trigonometric</div>
+            <div class="help-examples">sin(x), cos(x), tan(x)</div>
+          </div>
+          <div class="help-item">
+            <div class="help-category">Logarithmic</div>
+            <div class="help-examples">log(x), log2(x), log10(x)</div>
+          </div>
+          <div class="help-item">
+            <div class="help-category">Exponential</div>
+            <div class="help-examples">exp(x), 2^x, e^x</div>
+          </div>
+          <div class="help-item">
+            <div class="help-category">Other Functions</div>
+            <div class="help-examples">sqrt(x), abs(x), floor(x), ceil(x)</div>
+          </div>
+          <div class="help-item">
+            <div class="help-category">Constants</div>
+            <div class="help-examples">pi, e</div>
+          </div>
         </div>
+      </div>
     </div>
 
     <nav class="navbar">
-        <div class="nav-brand">Function Visualizer</div>
-        <div class="nav-actions">
-            <button class="icon-btn" id="helpBtn" title="Help">?</button>
-            <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
-            <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" title="Menu">☰</button>
-        </div>
+      <div class="nav-brand">Function Visualizer</div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="helpBtn" title="Help">?</button>
+        <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
+        <button
+          class="icon-btn mobile-menu-btn"
+          id="mobileMenuBtn"
+          title="Menu"
+        >
+          ☰
+        </button>
+      </div>
     </nav>
 
     <div class="container">
-        <div class="layout">
-            <aside class="control-panel" id="controlPanel">
-                <button class="panel-close-btn" id="panelCloseBtn">×</button>
-                
-                <div class="panel-section">
-                    <div class="section-header">
-                        <span class="section-icon">ƒ</span>
-                        <h3>Functions</h3>
-                    </div>
-                    <div id="functionsList" class="functions-container"></div>
-                    <button class="btn-add" id="addFunction">
-                        <span class="btn-icon">+</span>
-                        Add Function
-                    </button>
+      <div class="layout">
+        <aside class="control-panel" id="controlPanel">
+          <button class="panel-close-btn" id="panelCloseBtn">×</button>
+
+          <div class="panel-section">
+            <div class="section-header">
+              <span class="section-icon">ƒ</span>
+              <h3>Functions</h3>
+            </div>
+            <div id="functionsList" class="functions-container"></div>
+            <button class="btn-add" id="addFunction">
+              <span class="btn-icon">+</span>
+              Add Function
+            </button>
+          </div>
+
+          <div class="panel-section presets-section">
+            <div class="section-header">
+              <span class="section-icon">★</span>
+              <h3>Presets</h3>
+            </div>
+
+            <div class="preset-dropdown">
+              <button class="preset-dropdown-toggle" id="presetDropdownToggle">
+                <span>Select a preset function</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              <div class="preset-dropdown-menu" id="presetDropdownMenu">
+                <!-- Basic Functions -->
+                <div class="preset-dropdown-group">
+                  <div class="preset-dropdown-title">Basic Functions</div>
+                  <button class="preset-dropdown-item" data-function="x">
+                    x
+                  </button>
+                  <button class="preset-dropdown-item" data-function="x^2">
+                    x²
+                  </button>
+                  <button class="preset-dropdown-item" data-function="x^3">
+                    x³
+                  </button>
+                  <button class="preset-dropdown-item" data-function="1/x">
+                    1/x
+                  </button>
+                  <button class="preset-dropdown-item" data-function="sqrt(x)">
+                    √x
+                  </button>
+                  <button class="preset-dropdown-item" data-function="abs(x)">
+                    |x|
+                  </button>
                 </div>
 
-                <div class="panel-section presets-section">
-                    <div class="section-header">
-                        <span class="section-icon">★</span>
-                        <h3>Presets</h3>
-                    </div>
-                    
-                    <div class="preset-category">
-                        <div class="preset-title">Basic</div>
-                        <div class="preset-buttons">
-                            <button class="preset-pill" data-function="x">x</button>
-                            <button class="preset-pill" data-function="x^2">x²</button>
-                            <button class="preset-pill" data-function="x^3">x³</button>
-                            <button class="preset-pill" data-function="1/x">1/x</button>
-                            <button class="preset-pill" data-function="sqrt(x)">√x</button>
-                            <button class="preset-pill" data-function="abs(x)">|x|</button>
-                        </div>
-                    </div>
-
-                    <div class="preset-category">
-                        <div class="preset-title">Trigonometric</div>
-                        <div class="preset-buttons">
-                            <button class="preset-pill" data-function="sin(x)">sin(x)</button>
-                            <button class="preset-pill" data-function="cos(x)">cos(x)</button>
-                            <button class="preset-pill" data-function="tan(x)">tan(x)</button>
-                            <button class="preset-pill" data-function="sin(2*x)">sin(2x)</button>
-                        </div>
-                    </div>
-
-                    <div class="preset-category">
-                        <div class="preset-title">Exponential</div>
-                        <div class="preset-buttons">
-                            <button class="preset-pill" data-function="exp(x)">eˣ</button>
-                            <button class="preset-pill" data-function="2^x">2ˣ</button>
-                            <button class="preset-pill" data-function="log(x)">ln(x)</button>
-                            <button class="preset-pill" data-function="log10(x)">log(x)</button>
-                        </div>
-                    </div>
-
-                    <div class="preset-category">
-                        <div class="preset-title">Advanced</div>
-                        <div class="preset-buttons">
-                            <button class="preset-pill" data-function="sin(x)/x">sinc(x)</button>
-                            <button class="preset-pill" data-function="x^2*sin(x)">x²sin(x)</button>
-                            <button class="preset-pill" data-function="exp(-x^2)">e^(-x²)</button>
-                            <button class="preset-pill" data-function="sin(1/x)">sin(1/x)</button>
-                        </div>
-                    </div>
+                <!-- Trigonometric -->
+                <div class="preset-dropdown-group">
+                  <div class="preset-dropdown-title">Trigonometric</div>
+                  <button class="preset-dropdown-item" data-function="sin(x)">
+                    sin(x)
+                  </button>
+                  <button class="preset-dropdown-item" data-function="cos(x)">
+                    cos(x)
+                  </button>
+                  <button class="preset-dropdown-item" data-function="tan(x)">
+                    tan(x)
+                  </button>
+                  <button class="preset-dropdown-item" data-function="sin(2*x)">
+                    sin(2x)
+                  </button>
                 </div>
 
-                <div class="panel-section">
-                    <div class="section-header">
-                        <span class="section-icon">⊞</span>
-                        <h3>Axis Range</h3>
-                    </div>
-                    <div class="range-grid">
-                        <div class="input-wrapper">
-                            <label>X Min</label>
-                            <input type="number" id="xMin" value="-10" step="0.1">
-                        </div>
-                        <div class="input-wrapper">
-                            <label>X Max</label>
-                            <input type="number" id="xMax" value="10" step="0.1">
-                        </div>
-                        <div class="input-wrapper">
-                            <label>Y Min</label>
-                            <input type="number" id="yMin" value="-10" step="0.1">
-                        </div>
-                        <div class="input-wrapper">
-                            <label>Y Max</label>
-                            <input type="number" id="yMax" value="10" step="0.1">
-                        </div>
-                    </div>
+                <!-- Exponential -->
+                <div class="preset-dropdown-group">
+                  <div class="preset-dropdown-title">
+                    Exponential & Logarithmic
+                  </div>
+                  <button class="preset-dropdown-item" data-function="exp(x)">
+                    eˣ
+                  </button>
+                  <button class="preset-dropdown-item" data-function="2^x">
+                    2ˣ
+                  </button>
+                  <button class="preset-dropdown-item" data-function="log(x)">
+                    ln(x)
+                  </button>
+                  <button class="preset-dropdown-item" data-function="log10(x)">
+                    log(x)
+                  </button>
                 </div>
 
-                 
-
-                <div class="panel-section">
-                    <div class="section-header">
-                        <span class="section-icon">⚙</span>
-                        <h3>Display</h3>
-                    </div>
-                    <div class="toggles">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="gridLines" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-label">Grid Lines</span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="axisLines" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-label">Axis Labels</span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="smoothLine" checked>
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-label">Smooth Curves</span>
-                        </label>
-                    </div>
+                <!-- Advanced -->
+                <div class="preset-dropdown-group">
+                  <div class="preset-dropdown-title">Advanced</div>
+                  <button class="preset-dropdown-item" data-function="sin(x)/x">
+                    sinc(x)
+                  </button>
+                  <button
+                    class="preset-dropdown-item"
+                    data-function="x^2*sin(x)"
+                  >
+                    x²sin(x)
+                  </button>
+                  <button
+                    class="preset-dropdown-item"
+                    data-function="exp(-x^2)"
+                  >
+                    e^(-x²)
+                  </button>
+                  <button class="preset-dropdown-item" data-function="sin(1/x)">
+                    sin(1/x)
+                  </button>
                 </div>
+              </div>
+            </div>
+          </div>
 
-            
+          <div class="panel-section">
+            <div class="section-header">
+              <span class="section-icon">⊞</span>
+              <h3>Axis Range</h3>
+            </div>
+            <div class="range-grid">
+              <div class="input-wrapper">
+                <label>X Min</label>
+                <input type="number" id="xMin" value="-10" step="0.1" />
+              </div>
+              <div class="input-wrapper">
+                <label>X Max</label>
+                <input type="number" id="xMax" value="10" step="0.1" />
+              </div>
+              <div class="input-wrapper">
+                <label>Y Min</label>
+                <input type="number" id="yMin" value="-10" step="0.1" />
+              </div>
+              <div class="input-wrapper">
+                <label>Y Max</label>
+                <input type="number" id="yMax" value="10" step="0.1" />
+              </div>
+            </div>
+          </div>
 
-                <button class="btn-plot" id="plotButton">
-                    <span class="plot-icon">▶</span>
-                    Plot Functions
-                </button>
-            </aside>
+          <div class="panel-section">
+            <div class="section-header">
+              <span class="section-icon">⚙</span>
+              <h3>Display</h3>
+            </div>
+            <div class="toggles">
+              <label class="toggle-switch">
+                <input type="checkbox" id="gridLines" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Grid Lines</span>
+              </label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="axisLines" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Axis Labels</span>
+              </label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="smoothLine" checked />
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Smooth Curves</span>
+              </label>
+            </div>
+          </div>
 
-            <main class="graph-area">
-                <div class="graph-card">
-                    <div class="graph-header">
-                        <button class="download-btn" id="downloadBtn" title="Download Graph">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            Download
-                        </button>
-                    </div>
-                    <div class="graph-wrapper">
-                        <canvas id="functionGraph"></canvas>
-                    </div>
-                    <div class="graph-footer">
-                        <div class="graph-info" id="functionInfo">f(x) = x²</div>
-                        <div class="graph-coords" id="coordinates">(0, 0)</div>
-                    </div>
-                </div>
-            </main>
-        </div>
+          <!-- <button class="btn-plot" id="plotButton">
+            <span class="plot-icon">▶</span>
+            Plot Functions
+          </button> -->
+        </aside>
+
+        <main class="graph-area">
+          <div class="graph-card">
+            <div class="graph-header">
+              <button class="download-btn" id="resetBtn" title="Reset Graph">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 256 256"
+                  xml:space="preserve"
+                >
+                  <g
+                    style="
+                      stroke: none;
+                      stroke-width: 0;
+                      stroke-dasharray: none;
+                      stroke-linecap: butt;
+                      stroke-linejoin: miter;
+                      stroke-miterlimit: 10;
+                      fill: none;
+                      fill-rule: nonzero;
+                      opacity: 1;
+                    "
+                    transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)"
+                  >
+                    <path
+                      d="M 75.702 53.014 c -2.142 7.995 -7.27 14.678 -14.439 18.816 c -7.168 4.138 -15.519 5.239 -23.514 3.095 c -16.505 -4.423 -26.335 -21.448 -21.913 -37.953 C 20.258 20.467 37.286 10.64 53.79 15.06 c 4.213 1.129 8.076 3.118 11.413 5.809 l -8.349 8.35 h 26.654 V 2.565 l -8.354 8.354 c -5.1 -4.405 -11.133 -7.61 -17.74 -9.381 C 33.451 -4.882 8.735 9.389 2.314 33.35 c -6.42 23.961 7.851 48.678 31.811 55.098 C 38.001 89.486 41.934 90 45.842 90 c 7.795 0 15.488 -2.044 22.42 -6.046 c 10.407 -6.008 17.851 -15.709 20.962 -27.317 L 75.702 53.014 z"
+                      style="
+                        stroke: none;
+                        stroke-width: 1;
+                        stroke-dasharray: none;
+                        stroke-linecap: butt;
+                        stroke-linejoin: miter;
+                        stroke-miterlimit: 10;
+                        fill: rgb(255, 253, 253);
+                        fill-rule: nonzero;
+                        opacity: 0.7;
+                      "
+                      transform=" matrix(1 0 0 1 0 0) "
+                      stroke-linecap="round"
+                    />
+                  </g>
+                </svg>
+                Reset
+              </button>
+
+              <button
+                class="download-btn"
+                id="downloadBtn"
+                title="Download Graph"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download
+              </button>
+            </div>
+            <div class="graph-wrapper">
+              <canvas id="functionGraph"></canvas>
+            </div>
+            <div class="graph-footer">
+              <div class="graph-info" id="functionInfo">f(x) = x²</div>
+              <div class="graph-coords" id="coordinates">(0, 0)</div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
 
     <div class="toast" id="errorToast"></div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
